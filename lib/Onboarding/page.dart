@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_drive_filer/UI/circles_with_image.dart';
+import 'package:flutter_drive_filer/Onboarding/circles_with_image.dart';
 
 class Page extends StatelessWidget {
 
