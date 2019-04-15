@@ -4,7 +4,7 @@ import 'dart:math';
 const double IMAGE_SIZE = 250.0;
 
 class CircleWithImage extends StatelessWidget {
-  
+
   Widget _centerCircle(double radius, double opacity){
     return new Positioned(
       width: radius,

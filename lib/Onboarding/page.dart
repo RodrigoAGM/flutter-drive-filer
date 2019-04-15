@@ -10,14 +10,14 @@ class Page extends StatelessWidget {
   final double height;
   final double width;
 
-  Page({
+  Page(
     this.tittle,
     this.body,
     this.image,
     this.gradient,
     this.height,
     this.width,
-  });
+  );
 
   @override
   Widget build(BuildContext context) {
