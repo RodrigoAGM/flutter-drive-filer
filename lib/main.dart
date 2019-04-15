@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_drive_filer/UI/Onboarding/onboarding.dart';
+import 'package:flutter_drive_filer/ui/login/sign_in.dart';
+import 'package:flutter_drive_filer/ui/onboarding/onboarding.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,27 +10,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Welcome to Flutter',
       routes: <String, WidgetBuilder> {
-        '/login': (BuildContext context) => new Login(),
+        '/onboarding': (BuildContext context) => new OnboardingMainPage(),
+        '/login': (BuildContext context) => new Sign_in(),
       },
       home: new OnboardingMainPage(),
     );
   }
 }
 
-class Login extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Welcome to Flutter',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Welcome to Flutter'),
-        ),
-        body: Center(
-          child: Text('Hello World'),
-        ),
-      ),
-    );
-  }
-}
+
 
