@@ -9,7 +9,6 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
 );
 
 class Sign_in extends StatefulWidget {
-
   @override
   State createState() => SignInState();
 }
