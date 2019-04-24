@@ -1,47 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_drive_filer/bloc/drive_filer_bloc.dart';
+import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
+import 'package:flutter_drive_filer/ui/login/login_events.dart';
+import 'package:flutter_drive_filer/ui/login/login_states.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: [
-    'email',
-    'https://www.googleapis.com/auth/drive',
-  ]
-);
-
-class Sign_in extends StatefulWidget {
+class SignIn extends StatefulWidget {
   @override
-  State createState() => SignInState();
+  State createState() => _SignInState();
 }
 
-class SignInState extends State<Sign_in>{
-  GoogleSignInAccount _currentUser;
+class _SignInState extends State<SignIn>{
 
-  void initState(){
+  LoginBloc _loginBloc;
+
+  @override
+  void initState() {
     super.initState();
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account){
-      setState((){
-        _currentUser = account;
-      });
-      if (_currentUser != null){
-        //TODO
-      }
-    });
-    _googleSignIn.signInSilently();
+    _loginBloc = LoginBloc(googleSignInRepository: GoogleSignInRepository());
+    _loginBloc.dispatch(LoginEventInitSignIn());
   }
 
-  Future<void> _handleSignIn()async{
-    try{
-      await _googleSignIn.signIn();
-    }catch(error){
-      print(error);
-    }
+  @override
+  void dispose(){
+    super.dispose();
+    _loginBloc.dispose();
   }
 
-  Future<void> _handleSignOut()async{
-    _googleSignIn.disconnect();
-  }
-
-  Widget _buildBody() {
+  /*Widget _buildBody() {
     if (_currentUser != null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -65,26 +52,76 @@ class SignInState extends State<Sign_in>{
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           // ignore: const_eval_throws_exception, const_eval_throws_exception, invalid_constant
-          const Text("You are not currently signed in."),
-          RaisedButton(
-            child: const Text('SIGN IN'),
-            onPressed: _handleSignIn,
-          ),
+
         ],
       );
     }
-  }
+  }*/
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Google Sign in'),
-      ),
-      body: ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
+
+    return BlocProvider<LoginBloc>(
+      bloc: _loginBloc,
+      child: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            Container(
+              child: BlocBuilder<LoginEvent,LoginState>(
+                bloc: _loginBloc,
+                builder: (BuildContext context, LoginState state){
+                  if(state is LoginStateDefault){
+                    return Center(
+                      child: RaisedButton(
+                        child: const Text('SIGN IN'),
+                        onPressed: (){
+                          _loginBloc.dispatch(LoginEventSignIn());
+                        },
+                      ),
+                    );
+                  }
+
+                  if(state is LoginStateLoading){
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if(state is LoginStateError){
+                    return Center(
+                      child: Text(
+                        'Connection error!',
+                        style: TextStyle(color: Colors.red, fontSize: 24.0),
+                      ),
+                    );
+                  }
+
+                  if(state is LoginStateLoggedIn){
+                    return Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Connected ' + state.currentUser.displayName + ' !',
+                            style: TextStyle(color: Colors.blue, fontSize: 24.0),
+                          ),
+                          RaisedButton(
+                            child: const Text('SIGN OUT'),
+                            onPressed: (){
+                              _loginBloc.dispatch(LoginEventSignOut());
+                            },
+                          ),
+                        ],
+                      )
+                    );
+                  }
+                },
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

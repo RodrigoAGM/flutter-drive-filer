@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'Welcome to Flutter',
       routes: <String, WidgetBuilder> {
         '/onboarding': (BuildContext context) => new OnboardingMainPage(),
-        '/login': (BuildContext context) => new Sign_in(),
+        '/login': (BuildContext context) => new SignIn(),
       },
       home: new OnboardingMainPage(),
     );
