@@ -126,7 +126,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                       child: Text(isDone ? 'DONE' : 'NEXT',
                         style: TextStyle(color: Colors.white),),
                       onPressed: isDone ? () {
-                        Navigator.popAndPushNamed(context, '/login');
+                        Navigator.pushReplacementNamed(context, '/login');
                       } : () {
                         _controller.animateToPage(
                             page + 1, duration: Duration(milliseconds: 300),
@@ -179,7 +179,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                                     .copyWith(color: Colors.white),
                               ),
                               onPressed: () {
-                                Navigator.popAndPushNamed(context, '/login');
+                                Navigator.pushReplacementNamed(context, '/login');
                               },
                               highlightColor: Colors.white30,
                               splashColor: Colors.white30,

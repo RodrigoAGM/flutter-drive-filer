@@ -23,11 +23,7 @@ class GoogleSignInRepository{
   Future<GoogleSignInAccount> handleSignIn()async{
     try{
       await _googleSignIn.signIn();
-      GoogleSignInAccount _currentUser;
-      _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account){
-        _currentUser = account;
-      });
-      return _currentUser;
+      return _googleSignIn.currentUser;
     }catch(error){
       print(error);
     }
