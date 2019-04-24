@@ -1,0 +1,22 @@
+import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
+
+@immutable
+abstract class HomeState extends Equatable{
+  HomeState([List props = const []]) : super(props);
+}
+
+class HomeStateDefault extends HomeState {
+  @override
+  String toString() => 'HomeStateDefault';
+}
+
+class HomeStateLoading extends HomeState {
+  @override
+  String toString() => 'HomeStateLoading';
+}
+
+class HomeStateError extends HomeState {
+  @override
+  String toString() => 'HomeStateError';
+}

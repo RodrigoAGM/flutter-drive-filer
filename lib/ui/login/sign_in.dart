@@ -3,7 +3,6 @@ import 'package:flutter_drive_filer/bloc/drive_filer_bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
 import 'package:flutter_drive_filer/ui/login/login_events.dart';
 import 'package:flutter_drive_filer/ui/login/login_states.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignIn extends StatefulWidget {
@@ -27,37 +26,6 @@ class _SignInState extends State<SignIn>{
     super.dispose();
     _loginBloc.dispose();
   }
-
-  /*Widget _buildBody() {
-    if (_currentUser != null) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          ListTile(
-            leading: GoogleUserCircleAvatar(
-              identity: _currentUser,
-            ),
-            title: Text(_currentUser.displayName ?? ''),
-            subtitle: Text(_currentUser.email ?? ''),
-          ),
-          const Text("Signed in successfully."),
-          RaisedButton(
-            child: const Text('SIGN OUT'),
-            onPressed: _handleSignOut,
-          ),
-        ],
-      );
-    } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          // ignore: const_eval_throws_exception, const_eval_throws_exception, invalid_constant
-
-        ],
-      );
-    }
-  }*/
-
 
   @override
   Widget build(BuildContext context) {
