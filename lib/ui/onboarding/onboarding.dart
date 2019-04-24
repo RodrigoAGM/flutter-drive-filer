@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_drive_filer/UI/Onboarding/dot_indicators.dart';
 import 'package:flutter_drive_filer/UI/Onboarding/page.dart';
+import 'package:flutter_drive_filer/ui/login/sign_in.dart';
 
 class OnboardingMainPage extends StatefulWidget {
   static String tag = 'onboarding-page';
@@ -126,7 +127,8 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                       child: Text(isDone ? 'DONE' : 'NEXT',
                         style: TextStyle(color: Colors.white),),
                       onPressed: isDone ? () {
-                        Navigator.pushReplacementNamed(context, '/login');
+                        //Navigator.pushReplacementNamed(context, '/login');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
                       } : () {
                         _controller.animateToPage(
                             page + 1, duration: Duration(milliseconds: 300),
@@ -179,7 +181,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                                     .copyWith(color: Colors.white),
                               ),
                               onPressed: () {
-                                Navigator.pushReplacementNamed(context, '/login');
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
                               },
                               highlightColor: Colors.white30,
                               splashColor: Colors.white30,

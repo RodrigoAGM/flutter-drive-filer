@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_drive_filer/ui/login/sign_in.dart';
 import 'package:flutter_drive_filer/ui/onboarding/onboarding.dart';
 
 class BlocMainDelegate extends BlocDelegate{
@@ -26,10 +25,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Welcome to Flutter',
-      routes: <String, WidgetBuilder> {
-        '/onboarding': (BuildContext context) => new OnboardingMainPage(),
-        '/login': (BuildContext context) => new SignIn(),
-      },
       home: new OnboardingMainPage(),
     );
   }
