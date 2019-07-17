@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:googleapis/drive/v3.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -14,6 +15,16 @@ class HomeStateDefault extends HomeState {
 class HomeStateLoading extends HomeState {
   @override
   String toString() => 'HomeStateLoading';
+}
+
+class HomeStateSearched extends HomeState {
+
+  final Set<File> files;
+
+  HomeStateSearched(this.files);
+
+  @override
+  String toString() => 'HomeStateSearched';
 }
 
 class HomeStateError extends HomeState {

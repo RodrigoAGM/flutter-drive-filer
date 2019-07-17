@@ -27,6 +27,7 @@ class GoogleSignInRepository{
     }catch(error){
       print(error);
     }
+    return null;
   }
 
   Future<void> handleSignOut()async{

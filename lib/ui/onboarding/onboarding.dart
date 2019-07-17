@@ -11,20 +11,12 @@ class OnboardingMainPage extends StatefulWidget {
 
 class _OnboardingMainPageState extends State<OnboardingMainPage> {
   final _controller = new PageController();
+  final Textcolor = Colors.black45;
   final List<Widget> _pages = [
     new Page(
       'Take pictures',
       'Take a picture of anything you want to save from your class',
       'assets/camera.png',
-      LinearGradient(
-          colors: [
-            Colors.red[200],
-            Colors.red[600],
-            Colors.red[900],
-          ],
-          begin: Alignment(0.5, -1.0),
-          end: Alignment(0.5, 1.0)
-      ),
       170.0,
       170.0,
     ),
@@ -32,14 +24,6 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
       'Organize in folders',
       'Organize all of your pictures in folders for different courses and classes',
       'assets/picturefolder.png',
-      LinearGradient(
-          colors: [
-            Colors.purple[200],
-            Colors.deepPurple[600],
-            Colors.deepPurple[900],
-          ],
-          begin: Alignment(0.5, -1.0),
-          end: Alignment(0.5, 1.0)),
       170.0,
       170.0,
     ),
@@ -47,15 +31,6 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
       'Save everything',
       'Save all the pictures that you take in your Google Drive account',
       'assets/googledrive.png',
-      LinearGradient(
-          colors: [
-            Colors.lightBlue[200],
-            Colors.blue[600],
-            Colors.blue[900],
-          ],
-          begin: Alignment(0.5, -1.0),
-          end: Alignment(0.5, 1.0)
-      ),
       170.0,
       170.0,
     ),
@@ -110,7 +85,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                     children: <Widget>[
                       FlatButton(
                         child: Text(page >= 1 ? 'BACK' : '',
-                          style: TextStyle(color: Colors.white),),
+                          style: TextStyle(color: Textcolor),),
                         onPressed: () {
                           if (page >= 1) {
                             _controller.animateToPage(
@@ -125,7 +100,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                   actions: <Widget>[
                     FlatButton(
                       child: Text(isDone ? 'DONE' : 'NEXT',
-                        style: TextStyle(color: Colors.white),),
+                        style: TextStyle(color: Textcolor),),
                       onPressed: isDone ? () {
                         //Navigator.pushReplacementNamed(context, '/login');
                         Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
@@ -178,7 +153,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                                     .of(context)
                                     .textTheme
                                     .button
-                                    .copyWith(color: Colors.white),
+                                    .copyWith(color: Textcolor),
                               ),
                               onPressed: () {
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));

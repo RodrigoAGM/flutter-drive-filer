@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_drive_filer/bloc/sign_in_bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
+import 'package:flutter_drive_filer/ui/home/home.dart';
 import 'package:flutter_drive_filer/ui/login/login_events.dart';
 import 'package:flutter_drive_filer/ui/login/login_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,6 +40,7 @@ class _SignInState extends State<SignIn>{
               child: BlocBuilder<LoginEvent,LoginState>(
                 bloc: _loginBloc,
                 builder: (BuildContext context, LoginState state){
+
                   if(state is LoginStateDefault){
                     return Center(
                       child: RaisedButton(
@@ -78,7 +80,7 @@ class _SignInState extends State<SignIn>{
                           RaisedButton(
                             child: const Text('SIGN OUT'),
                             onPressed: (){
-                              _loginBloc.dispatch(LoginEventSignOut());
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Home(state.currentUser)));
                             },
                           ),
                         ],
