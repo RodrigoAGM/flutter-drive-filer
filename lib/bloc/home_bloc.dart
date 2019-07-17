@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_drive_repository.dart';
 import 'package:flutter_drive_filer/ui/home/home_events.dart';
 import 'package:flutter_drive_filer/ui/home/home_states.dart';
+import 'package:flutter_drive_filer/ui/res/strings.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState>{
 
@@ -22,9 +23,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
   Stream<HomeState> _mapListFoldersState(HomeEvent event) async*{
     try{
       yield HomeStateLoading();
-      var result = await googleDriveRepository.findFoldersWithName("DriveFilerApp");
+      var result = await googleDriveRepository.findFoldersWithName(Strings.app_folder_name);
       if(result.isEmpty){
-        googleDriveRepository.createFolder("DriveFilerApp");
+        googleDriveRepository.createFolder(Strings.app_folder_name);
       }
       var list = await googleDriveRepository.findAllFolders();
       yield HomeStateSearched(list);

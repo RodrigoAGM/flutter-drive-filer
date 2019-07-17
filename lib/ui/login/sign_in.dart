@@ -5,6 +5,8 @@ import 'package:flutter_drive_filer/ui/home/home.dart';
 import 'package:flutter_drive_filer/ui/login/login_events.dart';
 import 'package:flutter_drive_filer/ui/login/login_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_drive_filer/ui/res/strings.dart';
+import 'package:googleapis/slides/v1.dart' as prefix0;
 
 class SignIn extends StatefulWidget {
   @override
@@ -31,6 +33,8 @@ class _SignInState extends State<SignIn>{
   @override
   Widget build(BuildContext context) {
 
+    final textColor = Colors.black45;
+
     return BlocProvider<LoginBloc>(
       bloc: _loginBloc,
       child: Scaffold(
@@ -43,12 +47,39 @@ class _SignInState extends State<SignIn>{
 
                   if(state is LoginStateDefault){
                     return Center(
-                      child: RaisedButton(
-                        child: const Text('SIGN IN'),
-                        onPressed: (){
-                          _loginBloc.dispatch(LoginEventSignIn());
-                        },
-                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          new SizedBox(
+                              child: Image(
+                                image: AssetImage('assets/googledrive.png'),
+                                fit: BoxFit.fitHeight,
+                              ),
+                              height: MediaQuery.of(context).size.width/2,
+                              width: MediaQuery.of(context).size.width/2,
+                          ),
+                          new Container(
+                            child: Text(
+                              Strings.app_name,
+                              style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          new SizedBox(height: 10.0,),
+                          new RaisedButton(
+                            child: Text(
+                              Strings.login_button,
+                              style: Theme.of(context).textTheme.button.copyWith(color: textColor),),
+                            onPressed: (){
+                               _loginBloc.dispatch(LoginEventSignIn());
+                            },
+                            elevation: 7.0,
+                            highlightColor: Colors.white30,
+                            splashColor: Colors.white30,
+                            shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                          ),
+                        ],
+                      )
                     );
                   }
 
@@ -62,7 +93,7 @@ class _SignInState extends State<SignIn>{
                     return Center(
                       child: Text(
                         'Connection error!',
-                        style: TextStyle(color: Colors.red, fontSize: 24.0),
+                        style: Theme.of(context).textTheme.button.copyWith(color: Colors.red),
                       ),
                     );
                   }

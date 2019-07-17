@@ -11,7 +11,7 @@ class OnboardingMainPage extends StatefulWidget {
 
 class _OnboardingMainPageState extends State<OnboardingMainPage> {
   final _controller = new PageController();
-  final Textcolor = Colors.black45;
+  final textColor = Colors.black45;
   final List<Widget> _pages = [
     new Page(
       'Take pictures',
@@ -85,7 +85,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                     children: <Widget>[
                       FlatButton(
                         child: Text(page >= 1 ? 'BACK' : '',
-                          style: TextStyle(color: Textcolor),),
+                          style: TextStyle(color: textColor),),
                         onPressed: () {
                           if (page >= 1) {
                             _controller.animateToPage(
@@ -100,9 +100,8 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                   actions: <Widget>[
                     FlatButton(
                       child: Text(isDone ? 'DONE' : 'NEXT',
-                        style: TextStyle(color: Textcolor),),
+                        style: TextStyle(color: textColor),),
                       onPressed: isDone ? () {
-                        //Navigator.pushReplacementNamed(context, '/login');
                         Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
                       } : () {
                         _controller.animateToPage(
@@ -146,23 +145,15 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                             border: Border.all(color: Colors.white, width: 1.0),
                             color: Colors.transparent,
                           ),
-                          child: new Material(
-                            child: MaterialButton(
-                              child: Text('START',
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .button
-                                    .copyWith(color: Textcolor),
-                              ),
-                              onPressed: () {
+                          child: new RaisedButton(
+                            child: Text('Start!', style: Theme.of(context).textTheme.button.copyWith(color: textColor),),
+                            onPressed: (){
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
-                              },
-                              highlightColor: Colors.white30,
-                              splashColor: Colors.white30,
-                            ),
-                            color: Colors.transparent,
-                            borderRadius: new BorderRadius.circular(30.0),
+                            },
+                            elevation: 7.0,
+                            highlightColor: Colors.white30,
+                            splashColor: Colors.white30,
+                            shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
                           ),
                         ),
                       ],

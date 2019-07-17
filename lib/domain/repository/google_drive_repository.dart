@@ -94,7 +94,6 @@ class GoogleDriveRepository{
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
-          print("######################################" + file.toString());
           files.add(file);
         }
         pageToken = result.nextPageToken;
