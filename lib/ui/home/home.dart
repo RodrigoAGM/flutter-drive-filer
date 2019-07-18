@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_drive_filer/bloc/home_bloc.dart';
@@ -48,12 +47,12 @@ class _HomeState extends State<Home>{
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.transparent,
-          elevation: 1.0,
+          elevation: 0.0,
           titleSpacing: 0.0,
           title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
           actions: <Widget>[
             new IconButton(
-              icon: new Icon(CupertinoIcons.photo_camera_solid),
+              icon: new Icon(Icons.camera_alt),
               color: textColor,
               iconSize: 30.0,
               onPressed: (){},
@@ -62,7 +61,7 @@ class _HomeState extends State<Home>{
             ),
           ],
           leading: IconButton(
-            icon: new Icon(CupertinoIcons.right_chevron),
+            icon: new Icon(Icons.exit_to_app),
             // icon: new ClipOval(
             //   child: Image.network(_account.photoUrl)
             // ),
@@ -73,9 +72,29 @@ class _HomeState extends State<Home>{
             splashColor: Colors.white30,
           ),
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){},
+          icon: new Icon(Icons.create_new_folder),
+          label: Text('Add folder'),
+        ),
         body: Stack(
           children: <Widget>[
-            Container(
+            //Searcher
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                },
+                controller: null,
+                decoration: InputDecoration(
+                  labelText: "Search",
+                  hintText: "Search",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
+            Center(
               child: BlocBuilder<HomeEvent,HomeState>(
                 bloc: _homeBloc,
                 builder: (BuildContext context, HomeState state){
