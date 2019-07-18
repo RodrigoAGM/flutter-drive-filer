@@ -102,7 +102,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                       child: Text(isDone ? 'DONE' : 'NEXT',
                         style: TextStyle(color: textColor),),
                       onPressed: isDone ? () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignIn()));
                       } : () {
                         _controller.animateToPage(
                             page + 1, duration: Duration(milliseconds: 300),
@@ -148,7 +148,7 @@ class _OnboardingMainPageState extends State<OnboardingMainPage> {
                           child: new RaisedButton(
                             child: Text('Start!', style: Theme.of(context).textTheme.button.copyWith(color: textColor),),
                             onPressed: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignIn()));
                             },
                             elevation: 7.0,
                             highlightColor: Colors.white30,

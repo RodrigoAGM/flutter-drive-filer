@@ -24,11 +24,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
     try{
       yield HomeStateLoading();
       var result = await googleDriveRepository.findFoldersWithName(Strings.app_folder_name);
+      var childList;
+
       if(result.isEmpty){
-        googleDriveRepository.createFolder(Strings.app_folder_name);
+        var folder = await googleDriveRepository.createFolder(Strings.app_folder_name);
+        childList = await googleDriveRepository.findFilesInFolder(folder.id);
       }
-      var list = await googleDriveRepository.findAllFolders();
-      yield HomeStateSearched(list);
+      else{
+        childList = await googleDriveRepository.findFilesInFolder(result.first.id);
+      }
+
+      yield HomeStateSearched(childList);
 
     }catch(e){
       yield HomeStateError();

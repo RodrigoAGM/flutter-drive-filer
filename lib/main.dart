@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class Splash extends StatefulWidget {
 
   _SplashState createState() => _SplashState();

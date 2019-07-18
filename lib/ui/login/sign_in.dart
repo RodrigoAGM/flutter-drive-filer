@@ -21,7 +21,7 @@ class _SignInState extends State<SignIn>{
   void initState() {
     super.initState();
     _loginBloc = LoginBloc(googleSignInRepository: GoogleSignInRepository());
-    _loginBloc.dispatch(LoginEventInitSignIn());
+    _loginBloc.dispatch(LoginEventInitSignIn(context));
   }
 
   @override
@@ -71,7 +71,7 @@ class _SignInState extends State<SignIn>{
                               Strings.login_button,
                               style: Theme.of(context).textTheme.button.copyWith(color: textColor),),
                             onPressed: (){
-                               _loginBloc.dispatch(LoginEventSignIn());
+                               _loginBloc.dispatch(LoginEventSignIn(context));
                             },
                             elevation: 7.0,
                             highlightColor: Colors.white30,
@@ -95,27 +95,6 @@ class _SignInState extends State<SignIn>{
                         'Connection error!',
                         style: Theme.of(context).textTheme.button.copyWith(color: Colors.red),
                       ),
-                    );
-                  }
-
-                  if(state is LoginStateLoggedIn){
-                    return Container(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            'Connected ' + state.currentUser.displayName + ' !',
-                            style: TextStyle(color: Colors.blue, fontSize: 24.0),
-                          ),
-                          RaisedButton(
-                            child: const Text('SIGN OUT'),
-                            onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Home(state.currentUser)));
-                            },
-                          ),
-                        ],
-                      )
                     );
                   }
                 },

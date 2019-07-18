@@ -1,6 +1,8 @@
 import 'package:flutter_drive_filer/domain/model/google_http_client.dart';
+import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
+import 'package:googleapis/tagmanager/v1.dart';
 
 class GoogleDriveRepository{
 
@@ -13,6 +15,7 @@ class GoogleDriveRepository{
     File folder = new File();
     folder.name = name;
     folder.mimeType = this.mime;
+    folder.folderColorRgb = FolderColors.Blue_velvet;
 
     try{
       final headers = await _account.authHeaders;
@@ -37,7 +40,7 @@ class GoogleDriveRepository{
     try{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
-            q: "mimeType='application/vnd.google-apps.folder' and name='"+name+"'",
+            q: "mimeType='application/vnd.google-apps.folder' and name='"+name+"' and trashed = false",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
@@ -64,7 +67,7 @@ class GoogleDriveRepository{
     try{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
-            q: "mimeType='application/vnd.google-apps.folder' and name contains '"+name+"'",
+            q: "mimeType='application/vnd.google-apps.folder' and name contains '"+name+"' and trashed = false",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
@@ -84,13 +87,37 @@ class GoogleDriveRepository{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
     Set<File> files = new Set();
-
     String pageToken;
 
     try{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
-            q: "mimeType='application/vnd.google-apps.folder' and name='DriveFilerApp'",
+            q: "mimeType='application/vnd.google-apps.folder' and name='DriveFilerApp' and trashed = false",
+            spaces: "drive",
+            pageToken: pageToken);
+        for(File file in result.files){
+          files.add(file);
+        }
+        pageToken = result.nextPageToken;
+
+      }while(pageToken != null);
+      return files;
+    }catch(e){
+      print(e);
+      return null;
+    }
+  }
+
+  Future<Set<File>> findFilesInFolder(String folderId) async{
+    final headers = await _account.authHeaders;
+    final httpClient = GoogleHttpClient(headers);
+    Set<File> files = new Set();
+    String pageToken;
+
+    try{
+      do{
+        FileList result = await new DriveApi(httpClient).files.list(
+            q: "mimeType='application/vnd.google-apps.folder' and '"+folderId+"' in parents and trashed = false",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){

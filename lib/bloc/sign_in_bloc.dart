@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
+import 'package:flutter_drive_filer/ui/home/home.dart';
 import 'package:flutter_drive_filer/ui/login/login_events.dart';
 import 'package:flutter_drive_filer/ui/login/login_states.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +37,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState>{
       if(result == null) {
         yield LoginStateDefault();
       }else{
-        yield LoginStateLoggedIn(currentUser: result);
+        Navigator.pushReplacement(event.context, MaterialPageRoute(builder: (context) => Home(result)));
+        //yield LoginStateLoggedIn(currentUser: result);
       }
     }catch(e){
       yield LoginStateError();
@@ -50,7 +53,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState>{
       }else{
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('show', false);
-        yield LoginStateLoggedIn(currentUser: result);
+        Navigator.pushReplacement(event.context, MaterialPageRoute(builder: (context) => Home(result)));
+        //yield LoginStateLoggedIn(currentUser: result);
       }
     }catch(e){
       yield LoginStateError();
