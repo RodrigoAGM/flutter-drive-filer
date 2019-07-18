@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
 import 'package:flutter_drive_filer/ui/login/login_events.dart';
 import 'package:flutter_drive_filer/ui/login/login_states.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState>{
 
@@ -47,6 +48,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState>{
       if(result == null) {
         yield LoginStateError();
       }else{
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('show', false);
         yield LoginStateLoggedIn(currentUser: result);
       }
     }catch(e){
