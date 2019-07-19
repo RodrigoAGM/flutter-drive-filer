@@ -81,27 +81,31 @@ class _HomeState extends State<Home>{
                 barrierDismissible: true,
                 builder: (BuildContext context){
                   return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     title: Text("Confirmation"),
                     content: SingleChildScrollView(
                       child: ListBody(
                         children: <Widget>[
-                          Text("Do you want to logout?")
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Do you want to logout?"),
+                          )
                         ],
                       ),
                     ),
                     actions: <Widget>[
                       FlatButton(
                         onPressed: (){
+                          Navigator.pop(context);
+                        },
+                        child: Text("No", style: TextStyle(color: Colors.red),),
+                      ),
+                      FlatButton(
+                        onPressed: (){
                           _homeBloc.dispatch(HomeEventSignOut(context));
                           Navigator.pop(context);
                         },
                         child: Text("Yes"),
-                      ),
-                      FlatButton(
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        child: Text("No"),
                       ),
                     ],
                   );
@@ -115,24 +119,39 @@ class _HomeState extends State<Home>{
         floatingActionButton: FloatingActionButton.extended(
           onPressed: (){
             if(parent != ""){
-              var foldername = "Not working";
+              var foldername = "";
+              var folderdescription = "";
               showDialog(
                 context: context,
                 barrierDismissible: true,
                 builder: (BuildContext context){
                   return AlertDialog(
-                    title: Text("Confirmation"),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                    title: Text("Create Folder"),
                     content: SingleChildScrollView(
                       child: ListBody(
                         children: <Widget>[
                           Text("What's the name of the course?"),
+                          Container(height: 20.0,),
                           TextField(
                             onChanged: (value){
                               foldername = value;
                             },
                             decoration: InputDecoration(
-                              labelText: "Folder Name",
                               hintText: "Folder Name",
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(25.0))
+                              )
+                            )
+                          ),
+                          Container(height: 10.0,),
+                          TextField(
+                            maxLines: 3,
+                            onChanged: (value){
+                              folderdescription = value;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Description",
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(25.0))
                               )
@@ -144,16 +163,16 @@ class _HomeState extends State<Home>{
                     actions: <Widget>[
                       FlatButton(
                         onPressed: (){
-                          _homeBloc.dispatch(HomeEventCreateFolder(parent, foldername));
                           Navigator.pop(context);
                         },
-                        child: Text("Create"),
+                        child: Text("Cancel", style: TextStyle(color: Colors.red)),
                       ),
                       FlatButton(
                         onPressed: (){
+                          _homeBloc.dispatch(HomeEventCreateFolder(parent, foldername, folderdescription));
                           Navigator.pop(context);
                         },
-                        child: Text("Cancel"),
+                        child: Text("Create",),
                       ),
                     ],
                   );
@@ -231,23 +250,14 @@ class _HomeState extends State<Home>{
                       );
                     }else{
                       return Container(
-                        // child: Column(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   crossAxisAlignment: CrossAxisAlignment.center,
-                        //   children: <Widget>[
-                        //     Text(
-                        //       (state.files.length == 0)? 'No folders found !' : state.files.length.toString() + ' folders found!',
-                        //       style: TextStyle(color: Colors.blue, fontSize: 24.0),
-                        //     ),
-                        //   ],
-                        // )
+
                         alignment: Alignment.topCenter,
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: state.files.length,
                           itemBuilder: (context, index) {
                             return InkWell(
-                              onTap: (){print("HOlaaaaa");},
+                              onTap: (){},
                               child: ListBody(
                                 children: <Widget>[
                                   Container(
@@ -268,7 +278,7 @@ class _HomeState extends State<Home>{
                                           child: Icon(
                                             Icons.folder,
                                             size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
-                                            color: Color(FolderColors.Rainy_sky_hex),
+                                            color: HexColor(state.files[index].folderColorRgb),
                                           ),
                                         ),
                                         Center(
@@ -282,7 +292,7 @@ class _HomeState extends State<Home>{
                                               Container(
                                                 alignment:Alignment.center,
                                                 margin: EdgeInsets.only(top: 10.0),
-                                                width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2.5),
+                                                width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
                                                 child: Text(
                                                   (state.files[index].description != null) ? state.files[index].description : 'No description.',
                                                   overflow: TextOverflow.ellipsis,
@@ -325,4 +335,17 @@ class _HomeState extends State<Home>{
     );
   }
 
+}
+
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

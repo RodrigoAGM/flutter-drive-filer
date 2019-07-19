@@ -25,8 +25,9 @@ class HomeEventCreateFolder extends HomeEvent{
 
   final String parent;
   final String folderName;
+  final String folderDescription;
 
-  HomeEventCreateFolder(this.parent, this.folderName);
+  HomeEventCreateFolder(this.parent, this.folderName, this.folderDescription);
 
   @override
   String toString() => 'HomeEventCreateFolder';

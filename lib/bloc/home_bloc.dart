@@ -39,7 +39,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
       var parent;
 
       if(result.isEmpty){
-        var folder = await googleDriveRepository.createFolder(Strings.app_folder_name, "");
+        var folder = await googleDriveRepository.createFolder(Strings.app_folder_name, "", "");
         childList = await googleDriveRepository.findFilesInFolder(folder.id);
         parent = folder.id;
       }
@@ -47,7 +47,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
         childList = await googleDriveRepository.findFilesInFolder(result.first.id);
         parent = result.first.id;
       }
-      print("##################################" + parent);
       yield HomeStateSearched(childList, parent);
 
     }catch(e){
@@ -69,10 +68,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
   Stream<HomeState> _mapCreateFolderState(HomeEventCreateFolder event) async*{
     try{
       yield HomeStateLoading();
-      await googleDriveRepository.createFolder(event.folderName, event.parent);
+      print(event.folderDescription);
+      await googleDriveRepository.createFolder(event.folderName, event.parent, event.folderDescription);
       var childList = await googleDriveRepository.findFilesInFolder(event.parent);
       var parent = event.parent;
-
+      print(childList[0].folderColorRgb);
       yield HomeStateSearched(childList, parent);
     }
     catch(e){
