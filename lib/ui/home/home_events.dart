@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -10,3 +11,23 @@ class HomeEventListFolders extends HomeEvent {
   String toString() => 'HomeEventListFolders';
 }
 
+class HomeEventSignOut extends HomeEvent {
+
+  final BuildContext context;
+
+  HomeEventSignOut(this.context);
+
+  @override
+  String toString() => 'HomeEventSignOut';
+}
+
+class HomeEventCreateFolder extends HomeEvent{
+
+  final String parent;
+  final String folderName;
+
+  HomeEventCreateFolder(this.parent, this.folderName);
+
+  @override
+  String toString() => 'HomeEventCreateFolder';
+}

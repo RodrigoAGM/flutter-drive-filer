@@ -19,9 +19,10 @@ class HomeStateLoading extends HomeState {
 
 class HomeStateSearched extends HomeState {
 
-  final Set<File> files;
+  final List<File> files;
+  final String parent;
 
-  HomeStateSearched(this.files);
+  HomeStateSearched(this.files, this.parent);
 
   @override
   String toString() => 'HomeStateSearched';

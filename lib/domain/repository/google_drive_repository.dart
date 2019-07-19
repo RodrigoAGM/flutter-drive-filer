@@ -11,11 +11,18 @@ class GoogleDriveRepository{
 
   GoogleDriveRepository(this._account);
 
-  Future<File> createFolder(String name) async{
+  Future<File> createFolder(String name, String parent) async{
     File folder = new File();
     folder.name = name;
     folder.mimeType = this.mime;
-    folder.folderColorRgb = FolderColors.Blue_velvet;
+    if(parent == ""){
+      folder.folderColorRgb = FolderColors.Vern_fern;
+    }
+    else{
+      List<String> parents = [parent];
+      folder.parents = parents;
+      folder.folderColorRgb = FolderColors.Rainy_sky;
+    }
 
     try{
       final headers = await _account.authHeaders;
@@ -24,16 +31,16 @@ class GoogleDriveRepository{
       File file = await new DriveApi(httpClient).files.create(folder);
       return file;
     }catch(e){
-      print(e);
+      print(e.toString());
       return null;
     }
 
   }
 
-  Future<Set<File>> findFoldersWithName(String name) async{
+  Future<List<File>> findFoldersWithName(String name) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
-    Set<File> fileList = new Set();
+    List<File> fileList = [];
 
     String pageToken;
 
@@ -44,7 +51,6 @@ class GoogleDriveRepository{
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
-          print(file.name.toString());
           fileList.add(file);
         }
         pageToken = result.nextPageToken;
@@ -57,10 +63,10 @@ class GoogleDriveRepository{
     }
   }
 
-  Future<Set<File>> findFoldersThatContainName(String name) async{
+  Future<List<File>> findFoldersThatContainName(String name) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
-    Set<File> files = new Set();
+    List<File> files = [];
 
     String pageToken;
 
@@ -83,10 +89,10 @@ class GoogleDriveRepository{
     }
   }
 
-  Future<Set<File>> findAllFolders() async{
+  Future<List<File>> findAllFolders() async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
-    Set<File> files = new Set();
+    List<File> files = [];
     String pageToken;
 
     try{
@@ -108,10 +114,10 @@ class GoogleDriveRepository{
     }
   }
 
-  Future<Set<File>> findFilesInFolder(String folderId) async{
+  Future<List<File>> findFilesInFolder(String folderId) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
-    Set<File> files = new Set();
+    List<File> files = [];
     String pageToken;
 
     try{
