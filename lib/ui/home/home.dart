@@ -6,6 +6,7 @@ import 'package:flutter_drive_filer/domain/repository/google_drive_repository.da
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
 import 'package:flutter_drive_filer/ui/home/home_events.dart';
 import 'package:flutter_drive_filer/ui/home/home_states.dart';
+import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v2.dart';
@@ -245,33 +246,70 @@ class _HomeState extends State<Home>{
                           shrinkWrap: true,
                           itemCount: state.files.length,
                           itemBuilder: (context, index) {
-                            return ListBody(
-                              children: <Widget>[
-                                Container(
-                                  alignment: Alignment.center,
+                            return InkWell(
+                              onTap: (){print("HOlaaaaa");},
+                              child: ListBody(
+                                children: <Widget>[
+                                  Container(
+                                    alignment: Alignment.center,
 
-                                  margin: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context).size.width/15,
-                                    left: MediaQuery.of(context).size.width/15,
-                                    right: MediaQuery.of(context).size.width/15),
+                                    margin: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context).size.width/30,
+                                      left: MediaQuery.of(context).size.width/15,
+                                      right: MediaQuery.of(context).size.width/15,
+                                      top: MediaQuery.of(context).size.width/30,
+                                    ),
 
-                                  height: (MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2,
-                                  child: Text(state.files[index].name),
+                                    height: (MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        Center(
+                                          child: Icon(
+                                            Icons.folder,
+                                            size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
+                                            color: Color(FolderColors.Rainy_sky_hex),
+                                          ),
+                                        ),
+                                        Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Text(
+                                                  state.files[index].name,
+                                                  style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
+                                              ),
+                                              Container(
+                                                alignment:Alignment.center,
+                                                margin: EdgeInsets.only(top: 10.0),
+                                                width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2.5),
+                                                child: Text(
+                                                  (state.files[index].description != null) ? state.files[index].description : 'No description.',
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 3,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        )
+                                      ],
+                                    ),
 
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                    shape: BoxShape.rectangle,
-                                    color: Colors.grey[100],
-                                    boxShadow: <BoxShadow>[
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 5.0,
-                                        offset: Offset(1.0, 6.0)
-                                      ),
-                                    ]
-                                  ),
-                                )
-                              ],
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                      shape: BoxShape.rectangle,
+                                      color: Colors.grey[100],
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 5.0,
+                                          offset: Offset(1.0, 6.0)
+                                        ),
+                                      ]
+                                    ),
+                                  )
+                                ],
+                              ),
                             );
                           },
                         ),
