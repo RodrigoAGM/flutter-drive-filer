@@ -6,10 +6,10 @@ import 'package:flutter_drive_filer/domain/repository/google_drive_repository.da
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
 import 'package:flutter_drive_filer/ui/home/home_events.dart';
 import 'package:flutter_drive_filer/ui/home/home_states.dart';
+import 'package:flutter_drive_filer/ui/res/color_tools.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/drive/v2.dart';
 
 class Home extends StatefulWidget{
 
@@ -26,6 +26,10 @@ class _HomeState extends State<Home>{
 
   HomeBloc _homeBloc;
   GoogleSignInAccount _account;
+  var parent = "";
+  var selectedItem;
+  var selected = false;
+  var folderSelectedColor = FolderColors.Rainy_sky;
 
   _HomeState(this._account);
 
@@ -42,81 +46,25 @@ class _HomeState extends State<Home>{
     _homeBloc.dispose();
   }
 
+  void updateSelected(value){
+    selected = false;
+    selectedItem = null;
+    setState(() {
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
     final textColor = Colors.black54;
-    var parent = "";
+    final selectedColor = Colors.blue[200];
+
     return BlocProvider<HomeBloc>(
       bloc: _homeBloc,
       child: Scaffold(
 
-
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          titleSpacing: 0.0,
-          title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
-          actions: <Widget>[
-            new IconButton(
-              icon: new Icon(Icons.camera_alt),
-              color: textColor,
-              iconSize: 30.0,
-              onPressed: (){},
-              highlightColor: Colors.white30,
-              splashColor: Colors.white30,
-            ),
-          ],
-          leading: IconButton(
-            icon: new Icon(Icons.exit_to_app),
-            // icon: new ClipOval(
-            //   child: Image.network(_account.photoUrl)
-            // ),
-            color: textColor,
-            iconSize: 30.0,
-            onPressed: (){
-
-              showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (BuildContext context){
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                    title: Text("Confirmation"),
-                    content: SingleChildScrollView(
-                      child: ListBody(
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Do you want to logout?"),
-                          )
-                        ],
-                      ),
-                    ),
-                    actions: <Widget>[
-                      FlatButton(
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        child: Text("No", style: TextStyle(color: Colors.red),),
-                      ),
-                      FlatButton(
-                        onPressed: (){
-                          _homeBloc.dispatch(HomeEventSignOut(context));
-                          Navigator.pop(context);
-                        },
-                        child: Text("Yes"),
-                      ),
-                    ],
-                  );
-                }
-              );
-            },
-            highlightColor: Colors.white30,
-            splashColor: Colors.white30,
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
+        appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this).build(context) : MyAppbar(textColor, _homeBloc).build(this.context),
+        floatingActionButton: FloatingActionButton(
           onPressed: (){
             if(parent != ""){
               var foldername = "";
@@ -134,6 +82,7 @@ class _HomeState extends State<Home>{
                           Text("What's the name of the course?"),
                           Container(height: 20.0,),
                           TextField(
+                            textCapitalization: TextCapitalization.sentences,
                             onChanged: (value){
                               foldername = value;
                             },
@@ -156,7 +105,7 @@ class _HomeState extends State<Home>{
                                   borderRadius: BorderRadius.all(Radius.circular(25.0))
                               )
                             )
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -180,8 +129,7 @@ class _HomeState extends State<Home>{
               );
             }
           },
-          icon: new Icon(Icons.create_new_folder),
-          label: Text('Add folder'),
+          child: new Icon(Icons.create_new_folder),
         ),
 
 
@@ -203,6 +151,7 @@ class _HomeState extends State<Home>{
                     borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               ),
             ),
+
             Expanded(
               child: BlocBuilder<HomeEvent,HomeState>(
                 bloc: _homeBloc,
@@ -256,11 +205,17 @@ class _HomeState extends State<Home>{
                           shrinkWrap: true,
                           itemCount: state.files.length,
                           itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: (){},
-                              child: ListBody(
-                                children: <Widget>[
-                                  Container(
+                            return ListBody(
+                              children: <Widget>[
+                                InkWell(
+                                  onLongPress: (){
+                                    setState((){
+                                      selectedItem = index;
+                                      selected = true;
+                                    });
+                                  },
+                                  onTap: (){},
+                                  child: Container(
                                     alignment: Alignment.center,
 
                                     margin: EdgeInsets.only(
@@ -272,9 +227,9 @@ class _HomeState extends State<Home>{
 
                                     height: (MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: <Widget>[
-                                        Center(
+                                        Container(
+                                          padding: EdgeInsets.only(left: 8.0, right: 8.0),
                                           child: Icon(
                                             Icons.folder,
                                             size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
@@ -289,14 +244,16 @@ class _HomeState extends State<Home>{
                                                   state.files[index].name,
                                                   style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
                                               ),
-                                              Container(
-                                                alignment:Alignment.center,
-                                                margin: EdgeInsets.only(top: 10.0),
-                                                width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
-                                                child: Text(
-                                                  (state.files[index].description != null) ? state.files[index].description : 'No description.',
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 3,
+                                              Center(
+                                                child: Container(
+                                                  alignment:Alignment.center,
+                                                  margin: EdgeInsets.only(top: 10.0),
+                                                  width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
+                                                  child: Text(
+                                                    (state.files[index].description != null) ? state.files[index].description : 'No description.',
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 3,
+                                                  ),
                                                 ),
                                               )
                                             ],
@@ -304,11 +261,10 @@ class _HomeState extends State<Home>{
                                         )
                                       ],
                                     ),
-
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                                       shape: BoxShape.rectangle,
-                                      color: Colors.grey[100],
+                                      color: (selectedItem != null && selectedItem == index)? selectedColor : Colors.grey[100],
                                       boxShadow: <BoxShadow>[
                                         BoxShadow(
                                           color: Colors.black26,
@@ -318,8 +274,8 @@ class _HomeState extends State<Home>{
                                       ]
                                     ),
                                   )
-                                ],
-                              ),
+                                ),
+                              ],
                             );
                           },
                         ),
@@ -337,15 +293,119 @@ class _HomeState extends State<Home>{
 
 }
 
+class MyAppbar extends AppBar {
+  final Color textColor;
+  final HomeBloc _homeBloc;
+  MyAppbar(this.textColor, this._homeBloc);
 
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
+  Widget build(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0.0,
+      titleSpacing: 0.0,
+      title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
+      actions: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.camera_alt),
+          color: textColor,
+          iconSize: 30.0,
+          onPressed: (){},
+          highlightColor: Colors.white30,
+          splashColor: Colors.white30,
+        ),
+      ],
+      leading: IconButton(
+        icon: new Icon(Icons.exit_to_app),
+        color: textColor,
+        iconSize: 30.0,
+        onPressed: (){
+
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext context){
+              return AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                title: Text("Confirmation"),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Do you want to logout?"),
+                      )
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: (){
+                      Navigator.pop(context);
+                    },
+                    child: Text("No", style: TextStyle(color: Colors.red),),
+                  ),
+                  FlatButton(
+                    onPressed: (){
+                      _homeBloc.dispatch(HomeEventSignOut(context));
+                      Navigator.pop(context);
+                    },
+                    child: Text("Yes"),
+                  ),
+                ],
+              );
+            }
+          );
+        },
+        highlightColor: Colors.white30,
+        splashColor: Colors.white30,
+      ),
+    );
   }
+}
 
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+class MySelectedAppbar extends AppBar {
+  final Color textColor;
+  final HomeBloc _homeBloc;
+  final Color selectedColor;
+  var selected;
+  MySelectedAppbar(this.textColor, this._homeBloc, this.selectedColor, this.selected);
+
+  Widget build(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: selectedColor,
+      elevation: 0.0,
+      titleSpacing: 0.0,
+      title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
+      actions: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.color_lens),
+          color: textColor,
+          iconSize: 30.0,
+          onPressed: (){},
+          highlightColor: Colors.white30,
+          splashColor: Colors.white30,
+        ),
+        new IconButton(
+          icon: new Icon(Icons.delete),
+          color: textColor,
+          iconSize: 30.0,
+          onPressed: (){},
+          highlightColor: Colors.white30,
+          splashColor: Colors.white30,
+        ),
+      ],
+      leading: IconButton(
+        icon: new Icon(Icons.cancel),
+        color: textColor,
+        iconSize: 30.0,
+        onPressed: (){
+          selected.updateSelected(false);
+        },
+        highlightColor: Colors.white30,
+        splashColor: Colors.white30,
+      ),
+    );
+  }
 }
