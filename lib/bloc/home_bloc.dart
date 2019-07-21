@@ -7,6 +7,7 @@ import 'package:flutter_drive_filer/ui/home/home_events.dart';
 import 'package:flutter_drive_filer/ui/home/home_states.dart';
 import 'package:flutter_drive_filer/ui/login/sign_in.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState>{
 
@@ -64,6 +65,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
     try{
       yield HomeStateLoading();
       await googleSignInRepository.handleSignOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('show', true);
       Navigator.pushReplacement(event.context, MaterialPageRoute(builder: (context) => SignIn()));
     }
     catch(e){

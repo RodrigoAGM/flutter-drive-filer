@@ -408,7 +408,8 @@ class MyAppbar extends AppBar {
           icon: new Icon(Icons.camera_alt),
           color: textColor,
           iconSize: 30.0,
-          onPressed: (){},
+          onPressed: (){
+          },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
         ),
