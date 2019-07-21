@@ -39,6 +39,41 @@ class GoogleDriveRepository{
 
   }
 
+  Future<File> updateFolder(String name, String parent, String description, String folderColor, String folderId) async{
+
+    try{
+      final headers = await _account.authHeaders;
+      final httpClient = GoogleHttpClient(headers);
+
+      File folder = new File();
+      folder.mimeType = this.mime;
+      folder.name = name;
+      folder.folderColorRgb = folderColor;
+      folder.description = description;
+      File file = await new DriveApi(httpClient).files.update(folder, folderId);
+      return file;
+    }catch(e){
+      print(e.toString());
+      return null;
+    }
+
+  }
+
+   Future<File> deleteFolder(String folderId) async{
+
+    try{
+      final headers = await _account.authHeaders;
+      final httpClient = GoogleHttpClient(headers);
+
+      File file = await new DriveApi(httpClient).files.delete(folderId);
+      return file;
+    }catch(e){
+      print(e.toString());
+      return null;
+    }
+
+  }
+
   Future<List<File>> findFoldersWithName(String name) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
@@ -50,7 +85,7 @@ class GoogleDriveRepository{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
             q: "mimeType='application/vnd.google-apps.folder' and name='"+name+"' and trashed = false",
-            $fields: "nextPageToken, files(id, name, description, folderColorRgb)",
+            $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
@@ -77,7 +112,7 @@ class GoogleDriveRepository{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
             q: "mimeType='application/vnd.google-apps.folder' and name contains '"+name+"' and trashed = false",
-            $fields: "nextPageToken, files(id, name, description, folderColorRgb)",
+            $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
@@ -103,7 +138,7 @@ class GoogleDriveRepository{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
             q: "mimeType='application/vnd.google-apps.folder' and name='DriveFilerApp' and trashed = false",
-            $fields: "nextPageToken, files(id, name, description, folderColorRgb)",
+            $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){
@@ -129,7 +164,7 @@ class GoogleDriveRepository{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
             q: "mimeType='application/vnd.google-apps.folder' and '"+folderId+"' in parents and trashed = false",
-            $fields: "nextPageToken, files(id, name, description, folderColorRgb)",
+            $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){

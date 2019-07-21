@@ -10,6 +10,7 @@ import 'package:flutter_drive_filer/ui/res/color_tools.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart';
 
 class Home extends StatefulWidget{
 
@@ -30,6 +31,9 @@ class _HomeState extends State<Home>{
   var selectedItem;
   var selected = false;
   var folderSelectedColor = FolderColors.Rainy_sky;
+  var searched = false;
+  var searchedList;
+  var allItemsList;
 
   _HomeState(this._account);
 
@@ -38,6 +42,7 @@ class _HomeState extends State<Home>{
     super.initState();
     _homeBloc = HomeBloc(googleDriveRepository: GoogleDriveRepository(_account), googleSignInRepository: GoogleSignInRepository());
     _homeBloc.dispatch(HomeEventListFolders());
+    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -62,8 +67,7 @@ class _HomeState extends State<Home>{
     return BlocProvider<HomeBloc>(
       bloc: _homeBloc,
       child: Scaffold(
-
-        appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this).build(context) : MyAppbar(textColor, _homeBloc).build(this.context),
+        appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this, selectedItem).build(context) : MyAppbar(textColor, _homeBloc).build(this.context),
         floatingActionButton: FloatingActionButton(
           onPressed: (){
             if(parent != ""){
@@ -82,7 +86,7 @@ class _HomeState extends State<Home>{
                           Text("What's the name of the course?"),
                           Container(height: 20.0,),
                           TextField(
-                            textCapitalization: TextCapitalization.sentences,
+                            textCapitalization: TextCapitalization.words,
                             onChanged: (value){
                               foldername = value;
                             },
@@ -96,6 +100,7 @@ class _HomeState extends State<Home>{
                           Container(height: 10.0,),
                           TextField(
                             maxLines: 3,
+                            textCapitalization: TextCapitalization.sentences,
                             onChanged: (value){
                               folderdescription = value;
                             },
@@ -140,7 +145,17 @@ class _HomeState extends State<Home>{
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                autofocus: false,
                 onChanged: (value) {
+                  if(value.isNotEmpty && allItemsList != null){
+                    searchedList =  filterSearchResults(value, allItemsList);
+                    searched = true;
+                    setState(() { });
+                  }
+                  else{
+                    searched = false;
+                    setState(() { });
+                  }
                 },
                 controller: null,
                 decoration: InputDecoration(
@@ -148,7 +163,10 @@ class _HomeState extends State<Home>{
                   hintText: "Search",
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                    borderSide: BorderSide(color: textColor),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0))
+                  ),
+                ),
               ),
             ),
 
@@ -184,7 +202,16 @@ class _HomeState extends State<Home>{
 
                   if(state is HomeStateSearched){
                     parent = state.parent;
-                    if(state.files.length == 0){
+                    var itemsList;
+                    allItemsList = state.files;
+                    if(searched && searchedList != null){
+                      itemsList = searchedList;
+                    }else{
+                      itemsList = state.files;
+                    }
+
+
+                    if(itemsList.length == 0){
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -203,18 +230,20 @@ class _HomeState extends State<Home>{
                         alignment: Alignment.topCenter,
                         child: ListView.builder(
                           shrinkWrap: true,
-                          itemCount: state.files.length,
+                          itemCount: itemsList.length,
                           itemBuilder: (context, index) {
                             return ListBody(
                               children: <Widget>[
                                 InkWell(
                                   onLongPress: (){
                                     setState((){
-                                      selectedItem = index;
+                                      selectedItem = itemsList[index];
                                       selected = true;
                                     });
                                   },
-                                  onTap: (){},
+                                  onTap: (){
+
+                                  },
                                   child: Container(
                                     alignment: Alignment.center,
 
@@ -233,16 +262,25 @@ class _HomeState extends State<Home>{
                                           child: Icon(
                                             Icons.folder,
                                             size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
-                                            color: HexColor(state.files[index].folderColorRgb),
+                                            color: HexColor(itemsList[index].folderColorRgb),
                                           ),
                                         ),
                                         Center(
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: <Widget>[
-                                              Text(
-                                                  state.files[index].name,
-                                                  style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
+                                                  child: Text(
+                                                    itemsList[index].name,
+                                                    style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 3,
+                                                  ),
+                                                )
                                               ),
                                               Center(
                                                 child: Container(
@@ -250,8 +288,9 @@ class _HomeState extends State<Home>{
                                                   margin: EdgeInsets.only(top: 10.0),
                                                   width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
                                                   child: Text(
-                                                    (state.files[index].description != null) ? state.files[index].description : 'No description.',
+                                                    (itemsList[index].description != null) ? itemsList[index].description : 'No description.',
                                                     overflow: TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
                                                     maxLines: 3,
                                                   ),
                                                 ),
@@ -264,7 +303,7 @@ class _HomeState extends State<Home>{
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                                       shape: BoxShape.rectangle,
-                                      color: (selectedItem != null && selectedItem == index)? selectedColor : Colors.grey[100],
+                                      color: (selectedItem != null && selectedItem == itemsList[index])? selectedColor : Colors.grey[100],
                                       boxShadow: <BoxShadow>[
                                         BoxShadow(
                                           color: Colors.black26,
@@ -368,8 +407,9 @@ class MySelectedAppbar extends AppBar {
   final Color textColor;
   final HomeBloc _homeBloc;
   final Color selectedColor;
-  var selected;
-  MySelectedAppbar(this.textColor, this._homeBloc, this.selectedColor, this.selected);
+  final File selectedItem;
+  final _HomeState home;
+  MySelectedAppbar(this.textColor, this._homeBloc, this.selectedColor, this.home, this.selectedItem);
 
   Widget build(BuildContext context) {
     return AppBar(
@@ -377,13 +417,22 @@ class MySelectedAppbar extends AppBar {
       backgroundColor: selectedColor,
       elevation: 0.0,
       titleSpacing: 0.0,
-      title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
+      title: Text(selectedItem.name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
       actions: <Widget>[
         new IconButton(
           icon: new Icon(Icons.color_lens),
           color: textColor,
           iconSize: 30.0,
-          onPressed: (){},
+          onPressed: (){
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context){
+                return ColorPicker(selectedItem.folderColorRgb, selectedItem, _homeBloc, context);
+              }
+            );
+            home.updateSelected(false);
+          },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
         ),
@@ -391,7 +440,10 @@ class MySelectedAppbar extends AppBar {
           icon: new Icon(Icons.delete),
           color: textColor,
           iconSize: 30.0,
-          onPressed: (){},
+          onPressed: (){
+            _homeBloc.dispatch(HomeEventDeleteFolder(selectedItem.parents[0], selectedItem.id));
+            home.updateSelected(false);
+          },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
         ),
@@ -401,7 +453,7 @@ class MySelectedAppbar extends AppBar {
         color: textColor,
         iconSize: 30.0,
         onPressed: (){
-          selected.updateSelected(false);
+          home.updateSelected(false);
         },
         highlightColor: Colors.white30,
         splashColor: Colors.white30,
@@ -409,3 +461,16 @@ class MySelectedAppbar extends AppBar {
     );
   }
 }
+
+List<File> filterSearchResults(String query, List<File>items) {
+    List<File> searchedList = List<File>();
+    items.forEach((item){
+      print(item.name);
+      print(query);
+      if(item.name.toLowerCase().contains(query.toLowerCase())){
+        searchedList.add(item);
+      }
+    });
+    return searchedList;
+}
+

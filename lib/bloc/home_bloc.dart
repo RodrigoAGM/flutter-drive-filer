@@ -21,17 +21,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
   @override
   Stream<HomeState> mapEventToState(HomeState currentState, HomeEvent event) async*{
     if(event is HomeEventListFolders){
-      yield* _mapListFoldersState(event);
+      yield* _mapListFoldersEvent(event);
     }
     if(event is HomeEventSignOut){
-      yield* _mapSignOutState(event);
+      yield* _mapSignOutEvent(event);
     }
     if(event is HomeEventCreateFolder){
-      yield* _mapCreateFolderState(event);
+      yield* _mapCreateFolderEvent(event);
+    }
+    if(event is HomeEventUpdateFolder){
+      yield* _mapUpdateFolderEvent(event);
+    }
+    if(event is HomeEventDeleteFolder){
+      yield* _mapDeleteFolderEvent(event);
     }
   }
 
-  Stream<HomeState> _mapListFoldersState(HomeEvent event) async*{
+  Stream<HomeState> _mapListFoldersEvent(HomeEventListFolders event) async*{
     try{
       yield HomeStateLoading();
       var result = await googleDriveRepository.findFoldersWithName(Strings.app_folder_name);
@@ -54,7 +60,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
     }
   }
 
-  Stream<HomeState> _mapSignOutState(HomeEventSignOut event) async*{
+  Stream<HomeState> _mapSignOutEvent(HomeEventSignOut event) async*{
     try{
       yield HomeStateLoading();
       await googleSignInRepository.handleSignOut();
@@ -65,11 +71,41 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
     }
   }
 
-  Stream<HomeState> _mapCreateFolderState(HomeEventCreateFolder event) async*{
+  Stream<HomeState> _mapCreateFolderEvent(HomeEventCreateFolder event) async*{
     try{
       yield HomeStateLoading();
       print(event.folderDescription);
       await googleDriveRepository.createFolder(event.folderName, event.parent, event.folderDescription);
+      var childList = await googleDriveRepository.findFilesInFolder(event.parent);
+      var parent = event.parent;
+      print(childList[0].folderColorRgb);
+      yield HomeStateSearched(childList, parent);
+    }
+    catch(e){
+      print(e.toString());
+      yield HomeStateError();
+    }
+  }
+
+  Stream<HomeState> _mapUpdateFolderEvent(HomeEventUpdateFolder event) async*{
+    try{
+      yield HomeStateLoading();
+      await googleDriveRepository.updateFolder(event.folderName, event.parent, event.folderDescription, event.folderColor, event.folderId);
+      var childList = await googleDriveRepository.findFilesInFolder(event.parent);
+      var parent = event.parent;
+      print(childList[0].folderColorRgb);
+      yield HomeStateSearched(childList, parent);
+    }
+    catch(e){
+      print(e.toString());
+      yield HomeStateError();
+    }
+  }
+
+  Stream<HomeState> _mapDeleteFolderEvent(HomeEventDeleteFolder event) async*{
+    try{
+      yield HomeStateLoading();
+      await googleDriveRepository.deleteFolder(event.folderId);
       var childList = await googleDriveRepository.findFilesInFolder(event.parent);
       var parent = event.parent;
       print(childList[0].folderColorRgb);
