@@ -20,6 +20,9 @@ class CourseDaysBloc extends Bloc<CourseDaysEvent, CourseDaysState>{
     if(event is CourseDaysEventUpdateFolder){
       yield* _mapUpdateFolderEvent(event);
     }
+    if(event is CourseDaysEventDeleteFolder){
+      yield* _mapDeleteFolderEvent(event);
+    }
   }
 
   Stream<CourseDaysState> _mapListFoldersEvent(CourseDaysEventListFolders event) async*{
@@ -41,6 +44,19 @@ class CourseDaysBloc extends Bloc<CourseDaysEvent, CourseDaysState>{
       await googleDriveRepository.updateFolder(event.folderName, event.parent, event.folderDescription, event.folderColor, event.folderId);
       var childList = await googleDriveRepository.findFilesInFolder(event.parent);
       print(childList[0].folderColorRgb);
+      yield CourseDaysStateSearched(childList);
+    }
+    catch(e){
+      print(e.toString());
+      yield CourseDaysStateError();
+    }
+  }
+
+  Stream<CourseDaysState> _mapDeleteFolderEvent(CourseDaysEventDeleteFolder event) async*{
+    try{
+      yield CourseDaysStateLoading();
+      await googleDriveRepository.deleteFolder(event.folderId);
+      var childList = await googleDriveRepository.findFilesInFolder(event.parent);
       yield CourseDaysStateSearched(childList);
     }
     catch(e){
