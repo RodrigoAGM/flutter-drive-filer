@@ -180,99 +180,77 @@ class _course_daysState extends State<course_days> {
                           )
                         );
                       }else{
-                        return Container(
+                        return Column(
+                          children: <Widget>[
+                            Expanded(
+                              child: GridView.builder(
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                                shrinkWrap: true,
+                                itemCount: itemsList.length,
+                                itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onLongPress: (){
+                                          setState((){
+                                            selectedItem = itemsList[index];
+                                            selected = true;
+                                          });
+                                        },
+                                        onTap: (){
 
-                          alignment: Alignment.topCenter,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: itemsList.length,
-                            itemBuilder: (context, index) {
-                              return ListBody(
-                                children: <Widget>[
-                                  InkWell(
-                                    onLongPress: (){
-                                      setState((){
-                                        selectedItem = itemsList[index];
-                                        selected = true;
-                                      });
-                                    },
-                                    onTap: (){
-
-                                    },
-                                    child: Container(
-                                      alignment: Alignment.center,
-
-                                      margin: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context).size.width/30,
-                                        left: MediaQuery.of(context).size.width/15,
-                                        right: MediaQuery.of(context).size.width/15,
-                                        top: MediaQuery.of(context).size.width/30,
-                                      ),
-
-                                      height: (MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                                            child: Icon(
-                                              Icons.folder,
-                                              size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
-                                              color: HexColor(itemsList[index].folderColorRgb),
-                                            ),
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          margin: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context).size.width/60,
+                                            left: MediaQuery.of(context).size.width/30,
+                                            right: MediaQuery.of(context).size.width/30,
+                                            top: MediaQuery.of(context).size.width/60,
                                           ),
-                                          Center(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Center(
-                                                  child: Container(
-                                                    alignment: Alignment.center,
-                                                    width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
-                                                    child: Text(
-                                                      itemsList[index].name,
-                                                      style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
-                                                      overflow: TextOverflow.ellipsis,
-                                                      textAlign: TextAlign.center,
-                                                      maxLines: 3,
-                                                    ),
-                                                  )
+
+                                          height: (MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Center(
+                                                child: Icon(
+                                                  Icons.folder,
+                                                  size: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/3),
+                                                  color: HexColor(itemsList[index].folderColorRgb),
                                                 ),
-                                                Center(
-                                                  child: Container(
-                                                    alignment:Alignment.center,
-                                                    margin: EdgeInsets.only(top: 10.0),
-                                                    width: ((MediaQuery.of(context).size.width- ((MediaQuery.of(context).size.width/15) *2))/2),
-                                                    child: Text(
-                                                      (itemsList[index].description != null) ? itemsList[index].description : 'No description.',
-                                                      overflow: TextOverflow.ellipsis,
-                                                      textAlign: TextAlign.center,
-                                                      maxLines: 3,
-                                                    ),
+                                              ),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    itemsList[index].name,
+                                                    style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold,),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 3,
                                                   ),
                                                 )
-                                              ],
-                                            )
-                                          )
-                                        ],
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                        shape: BoxShape.rectangle,
-                                        color: (selectedItem != null && selectedItem == itemsList[index])? selectedColor : Colors.grey[100],
-                                        boxShadow: <BoxShadow>[
-                                          BoxShadow(
-                                            color: Colors.black26,
-                                            blurRadius: 5.0,
-                                            offset: Offset(1.0, 6.0)
+                                              ),
+                                            ],
                                           ),
-                                        ]
-                                      ),
-                                    )
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                            shape: BoxShape.rectangle,
+                                            color: (selectedItem != null && selectedItem == itemsList[index])? selectedColor : Colors.grey[100],
+                                            boxShadow: <BoxShadow>[
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 5.0,
+                                                offset: Offset(1.0, 6.0)
+                                              ),
+                                            ]
+                                          ),
+                                        )
+                                      );
+                                },
+                              ),
+                            )
+                          ],
                         );
                       }
                     }
