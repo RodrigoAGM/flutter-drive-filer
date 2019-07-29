@@ -1,5 +1,3 @@
-import 'dart:io' as prefix0;
-
 import 'package:equatable/equatable.dart';
 import 'package:googleapis/drive/v3.dart';
 import 'package:meta/meta.dart';

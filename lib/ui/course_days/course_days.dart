@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_drive_filer/bloc/home_bloc.dart';
+import 'package:flutter_drive_filer/bloc/course_days_bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_drive_repository.dart';
-import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
-import 'package:flutter_drive_filer/ui/course_days/course_days.dart';
-import 'package:flutter_drive_filer/ui/home/home_events.dart';
-import 'package:flutter_drive_filer/ui/home/home_states.dart';
+import 'package:flutter_drive_filer/ui/course_days/course_days_events.dart';
+import 'package:flutter_drive_filer/ui/course_days/course_days_states.dart';
 import 'package:flutter_drive_filer/ui/res/color_tools.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
 
-class Home extends StatefulWidget{
+class course_days extends StatefulWidget {
 
   final GoogleSignInAccount _account;
+  final File course;
 
-  Home(this._account);
+  course_days(this._account, this.course);
 
-  @override
-  State createState() => _HomeState(_account);
-
+  _course_daysState createState() => _course_daysState(_account, course);
 }
 
-class _HomeState extends State<Home>{
+class _course_daysState extends State<course_days> {
 
-  HomeBloc _homeBloc;
+  CourseDaysBloc _courseDaysBloc;
   GoogleSignInAccount _account;
-  var parent = "";
+  File _course;
+
+  _course_daysState(this._account, this._course);
+
   var selectedItem;
   var selected = false;
   var folderSelectedColor = FolderColors.Rainy_sky;
@@ -37,19 +36,18 @@ class _HomeState extends State<Home>{
   var allItemsList;
   var searchFocused = false;
 
-  _HomeState(this._account);
 
   @override
   void initState() {
     super.initState();
-    _homeBloc = HomeBloc(googleDriveRepository: GoogleDriveRepository(_account), googleSignInRepository: GoogleSignInRepository());
-    _homeBloc.dispatch(HomeEventListFolders());
+    _courseDaysBloc = CourseDaysBloc(GoogleDriveRepository(_account));
+    _courseDaysBloc.dispatch(CourseDaysEventListFolders(_course.id));
   }
 
   @override
   void dispose(){
     super.dispose();
-    _homeBloc.dispose();
+    _courseDaysBloc.dispose();
   }
 
   void updateSelected(value){
@@ -71,39 +69,7 @@ class _HomeState extends State<Home>{
       setState(() { });
       return false;
     }else{
-      return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context){
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Do you want to close the app?"),
-                  )
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: (){
-                  Navigator.pop(context, false);
-                },
-                child: Text("No", style: TextStyle(color: Colors.red),),
-              ),
-              FlatButton(
-                onPressed: (){
-                  Navigator.pop(context, true);
-                },
-                child: Text("Yes"),
-              ),
-            ],
-          );
-        }
-      );
+      return true;
     }
   }
 
@@ -113,85 +79,15 @@ class _HomeState extends State<Home>{
     final textColor = Colors.black54;
     final selectedColor = Colors.blue[200];
 
-    return BlocProvider<HomeBloc>(
-      bloc: _homeBloc,
+    return BlocProvider<CourseDaysBloc>(
+      bloc: _courseDaysBloc,
       child: WillPopScope(
 
         onWillPop: _onWillPop,
 
         child: Scaffold(
 
-          appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this, selectedItem).build(context) : MyAppbar(textColor, _homeBloc, this).build(this.context),
-
-          floatingActionButton: FloatingActionButton(
-            onPressed: (){
-              if(parent != ""){
-                var foldername = "";
-                var folderdescription = "";
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (BuildContext context){
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                      title: Text("Create Folder"),
-                      content: SingleChildScrollView(
-                        child: ListBody(
-                          children: <Widget>[
-                            Text("What's the name of the course?"),
-                            Container(height: 20.0,),
-                            TextField(
-                              textCapitalization: TextCapitalization.words,
-                              onChanged: (value){
-                                foldername = value;
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Folder Name",
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(25.0))
-                                )
-                              )
-                            ),
-                            Container(height: 10.0,),
-                            TextField(
-                              maxLines: 3,
-                              textCapitalization: TextCapitalization.sentences,
-                              onChanged: (value){
-                                folderdescription = value;
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Description",
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(25.0))
-                                )
-                              )
-                            ),
-                          ],
-                        ),
-                      ),
-                      actions: <Widget>[
-                        FlatButton(
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
-                        ),
-                        FlatButton(
-                          onPressed: (){
-                            _homeBloc.dispatch(HomeEventCreateFolder(parent, foldername, folderdescription));
-                            Navigator.pop(context);
-                          },
-                          child: Text("Create",),
-                        ),
-                      ],
-                    );
-                  }
-                );
-              }
-            },
-            child: new Icon(Icons.create_new_folder),
-          ),
-
+          appBar: (selected) ? MySelectedAppbar(textColor, _courseDaysBloc, selectedColor, this, selectedItem).build(context) : MyAppbar(textColor, _courseDaysBloc, this).build(this.context),
 
           body: Column(
 
@@ -230,27 +126,28 @@ class _HomeState extends State<Home>{
               ),
 
               Expanded(
-                child: BlocBuilder<HomeEvent,HomeState>(
-                  bloc: _homeBloc,
-                  builder: (BuildContext context, HomeState state){
-                    if(state is HomeStateDefault){
+                child: BlocBuilder<CourseDaysEvent,CourseDaysState>(
+                  bloc: _courseDaysBloc,
+                  builder: (BuildContext context, CourseDaysState state){
+
+                    if(state is CourseDaysStateDefault){
                       return Center(
                         child: RaisedButton(
                           child: const Text('Refresh'),
                           onPressed: (){
-                            _homeBloc.dispatch(HomeEventListFolders());
+                            _courseDaysBloc.dispatch(CourseDaysEventListFolders(_course.id));
                           },
                         ),
                       );
                     }
 
-                    if(state is HomeStateLoading){
+                    if(state is CourseDaysStateLoading){
                       return Center(
                         child: CircularProgressIndicator(),
                       );
                     }
 
-                    if(state is HomeStateError){
+                    if(state is CourseDaysStateError){
                       return Center(
                         child: Text(
                           'Connection error!',
@@ -259,8 +156,7 @@ class _HomeState extends State<Home>{
                       );
                     }
 
-                    if(state is HomeStateSearched){
-                      parent = state.parent;
+                    if(state is CourseDaysStateSearched){
                       var itemsList;
                       allItemsList = state.files;
                       if(searched && searchedList != null){
@@ -301,7 +197,7 @@ class _HomeState extends State<Home>{
                                       });
                                     },
                                     onTap: (){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => course_days(_account, itemsList[index])));
+
                                     },
                                     child: Container(
                                       alignment: Alignment.center,
@@ -380,7 +276,6 @@ class _HomeState extends State<Home>{
                         );
                       }
                     }
-
                   },
                 ),
               )
@@ -390,15 +285,14 @@ class _HomeState extends State<Home>{
       )
     );
   }
-
 }
 
 class MyAppbar extends AppBar {
   final Color textColor;
-  final HomeBloc _homeBloc;
-  final _HomeState home;
+  final CourseDaysBloc _courseDaysBloc;
+  final _course_daysState courseDays;
 
-  MyAppbar(this.textColor, this._homeBloc, this.home);
+  MyAppbar(this.textColor, this._courseDaysBloc, this.courseDays);
 
   Widget build(BuildContext context) {
     return AppBar(
@@ -413,75 +307,40 @@ class MyAppbar extends AppBar {
           color: textColor,
           iconSize: 30.0,
           onPressed: (){
-            if(home.allItemsList != null && home.allItemsList.length > 0){
-              _homeBloc.dispatch(HomeEventTakePicture(home.allItemsList, home.allItemsList[0].parents[0], context));
-            }
-            else{
-              showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (BuildContext context){
-                  return AlertDialog(
-                    title: Text("Alert"),
-                    content: Text("There are no courses to save pictures. Add a new course to start saving pictures!"),
-                    actions: <Widget>[
-                      FlatButton(
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: Text("Ok", style: TextStyle(color: Colors.blue)),
-                      ),
-                    ],
-                  );
-                }
-              );
-            }
+            // if(home.allItemsList != null && home.allItemsList.length > 0){
+            //   _homeBloc.dispatch(HomeEventTakePicture(home.allItemsList, home.allItemsList[0].parents[0], context));
+            // }
+            // else{
+            //   showDialog(
+            //     context: context,
+            //     barrierDismissible: true,
+            //     builder: (BuildContext context){
+            //       return AlertDialog(
+            //         title: Text("Alert"),
+            //         content: Text("There are no courses to save pictures. Add a new course to start saving pictures!"),
+            //         actions: <Widget>[
+            //           FlatButton(
+            //               onPressed: (){
+            //                 Navigator.pop(context);
+            //               },
+            //               child: Text("Ok", style: TextStyle(color: Colors.blue)),
+            //           ),
+            //         ],
+            //       );
+            //     }
+            //   );
+            // }
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
         ),
       ],
       leading: IconButton(
-        icon: new Icon(Icons.exit_to_app),
+        icon: new Icon(Icons.arrow_back),
         color: textColor,
         iconSize: 30.0,
         onPressed: (){
-
-          showDialog(
-            context: context,
-            barrierDismissible: true,
-            builder: (BuildContext context){
-              return AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                title: Text("Confirmation"),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Do you want to logout?"),
-                      )
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                    child: Text("No", style: TextStyle(color: Colors.red),),
-                  ),
-                  FlatButton(
-                    onPressed: (){
-                      _homeBloc.dispatch(HomeEventSignOut(context));
-                      Navigator.pop(context);
-                    },
-                    child: Text("Yes"),
-                  ),
-                ],
-              );
-            }
-          );
+          Navigator.pop(context);
         },
         highlightColor: Colors.white30,
         splashColor: Colors.white30,
@@ -492,11 +351,11 @@ class MyAppbar extends AppBar {
 
 class MySelectedAppbar extends AppBar {
   final Color textColor;
-  final HomeBloc _homeBloc;
+  final CourseDaysBloc _courseDaysBloc;
   final Color selectedColor;
   final File selectedItem;
-  final _HomeState home;
-  MySelectedAppbar(this.textColor, this._homeBloc, this.selectedColor, this.home, this.selectedItem);
+  final _course_daysState courseDays;
+  MySelectedAppbar(this.textColor, this._courseDaysBloc, this.selectedColor, this.courseDays, this.selectedItem);
 
   Widget build(BuildContext context) {
 
@@ -516,10 +375,10 @@ class MySelectedAppbar extends AppBar {
               context: context,
               barrierDismissible: true,
               builder: (BuildContext context){
-                return ColorPicker(selectedItem.folderColorRgb, selectedItem, _homeBloc, context);
+                return ColorPickerCourse(selectedItem.folderColorRgb, selectedItem, _courseDaysBloc, context);
               }
             );
-            home.updateSelected(false);
+            courseDays.updateSelected(false);
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
@@ -555,8 +414,8 @@ class MySelectedAppbar extends AppBar {
                     FlatButton(
                       onPressed: (){
                         Navigator.pop(context);
-                        _homeBloc.dispatch(HomeEventDeleteFolder(selectedItem.parents[0], selectedItem.id));
-                        home.updateSelected(false);
+                        _courseDaysBloc.dispatch(CourseDaysEventDeleteFolder(selectedItem.parents[0], selectedItem.id));
+                        courseDays.updateSelected(false);
                       },
                       child: Text("Yes"),
                     ),
@@ -574,7 +433,7 @@ class MySelectedAppbar extends AppBar {
         color: textColor,
         iconSize: 30.0,
         onPressed: (){
-          home.updateSelected(false);
+          courseDays.updateSelected(false);
         },
         highlightColor: Colors.white30,
         splashColor: Colors.white30,
