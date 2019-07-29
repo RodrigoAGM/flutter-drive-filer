@@ -301,7 +301,7 @@ class _HomeState extends State<Home>{
                                           });
                                         },
                                         onTap: (){
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => course_days(_account, itemsList[index])));
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => CourseDays(_account, itemsList[index])));
                                         },
                                         child: Container(
                                           alignment: Alignment.center,
@@ -409,6 +409,16 @@ class MyAppbar extends AppBar {
       titleSpacing: 0.0,
       title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
       actions: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.refresh),
+          color: textColor,
+          iconSize: 30.0,
+          onPressed: (){
+            _homeBloc.dispatch(HomeEventListFolders());
+          },
+          highlightColor: Colors.white30,
+          splashColor: Colors.white30,
+        ),
         new IconButton(
           icon: new Icon(Icons.camera_alt),
           color: textColor,

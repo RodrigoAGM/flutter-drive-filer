@@ -75,17 +75,25 @@ class GoogleDriveRepository{
 
   }
 
-  Future<List<File>> findFoldersWithName(String name) async{
+  Future<List<File>> findFoldersWithName(String name, String parent) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
     List<File> fileList = [];
 
     String pageToken;
+    var query;
+
+    if(parent == ""){
+      query = "mimeType='application/vnd.google-apps.folder' and name='"+name+"' and trashed = false";
+    }else{
+      query = "mimeType='application/vnd.google-apps.folder' and name='"+name+"' and trashed = false and '"+parent+"' in parents";
+    }
+    print(query);
 
     try{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
-            q: "mimeType='application/vnd.google-apps.folder' and name='"+name+"' and trashed = false",
+            q: query,
             $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
@@ -129,7 +137,7 @@ class GoogleDriveRepository{
     }
   }
 
-  Future<List<File>> findAllFolders() async{
+  Future<List<File>> findAllFolders(String parent) async{
     final headers = await _account.authHeaders;
     final httpClient = GoogleHttpClient(headers);
     List<File> files = [];
@@ -138,7 +146,7 @@ class GoogleDriveRepository{
     try{
       do{
         FileList result = await new DriveApi(httpClient).files.list(
-            q: "mimeType='application/vnd.google-apps.folder' and name='DriveFilerApp' and trashed = false",
+            q: "mimeType='application/vnd.google-apps.folder' and name='DriveFilerApp' and trashed = false and '"+parent+"' in parents",
             $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
             spaces: "drive",
             pageToken: pageToken);
@@ -166,6 +174,32 @@ class GoogleDriveRepository{
         FileList result = await new DriveApi(httpClient).files.list(
             q: "mimeType='application/vnd.google-apps.folder' and '"+folderId+"' in parents and trashed = false",
             $fields: "nextPageToken, files(id, name, description, folderColorRgb, parents)",
+            spaces: "drive",
+            pageToken: pageToken);
+        for(File file in result.files){
+          files.add(file);
+        }
+        pageToken = result.nextPageToken;
+
+      }while(pageToken != null);
+      return files;
+    }catch(e){
+      print(e);
+      return null;
+    }
+  }
+
+  Future<List<File>> findPicturesInFolder(String folderId) async{
+    final headers = await _account.authHeaders;
+    final httpClient = GoogleHttpClient(headers);
+    List<File> files = [];
+    String pageToken;
+
+    try{
+      do{
+        FileList result = await new DriveApi(httpClient).files.list(
+            q: "mimeType='image/jpeg' and '"+folderId+"' in parents and trashed = false",
+            $fields: "nextPageToken, files(id, name, parents, thumbnailLink)",
             spaces: "drive",
             pageToken: pageToken);
         for(File file in result.files){

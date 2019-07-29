@@ -4,29 +4,29 @@ import 'package:flutter_drive_filer/bloc/course_days_bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_drive_repository.dart';
 import 'package:flutter_drive_filer/ui/course_days/course_days_events.dart';
 import 'package:flutter_drive_filer/ui/course_days/course_days_states.dart';
+import 'package:flutter_drive_filer/ui/pictures_list/pictures_list.dart';
 import 'package:flutter_drive_filer/ui/res/color_tools.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
-import 'package:flutter_drive_filer/ui/res/strings.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
 
-class course_days extends StatefulWidget {
+class CourseDays extends StatefulWidget {
 
   final GoogleSignInAccount _account;
   final File course;
 
-  course_days(this._account, this.course);
+  CourseDays(this._account, this.course);
 
-  _course_daysState createState() => _course_daysState(_account, course);
+  _CourseDaysState createState() => _CourseDaysState(_account, course);
 }
 
-class _course_daysState extends State<course_days> {
+class _CourseDaysState extends State<CourseDays> {
 
   CourseDaysBloc _courseDaysBloc;
   GoogleSignInAccount _account;
   File _course;
 
-  _course_daysState(this._account, this._course);
+  _CourseDaysState(this._account, this._course);
 
   var selectedItem;
   var selected = false;
@@ -196,7 +196,7 @@ class _course_daysState extends State<course_days> {
                                           });
                                         },
                                         onTap: (){
-
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => PicturesList(_account, itemsList[index])));
                                         },
                                         child: Container(
                                           alignment: Alignment.center,
@@ -268,7 +268,7 @@ class _course_daysState extends State<course_days> {
 class MyAppbar extends AppBar {
   final Color textColor;
   final CourseDaysBloc _courseDaysBloc;
-  final _course_daysState courseDays;
+  final _CourseDaysState courseDays;
 
   MyAppbar(this.textColor, this._courseDaysBloc, this.courseDays);
 
@@ -285,11 +285,21 @@ class MyAppbar extends AppBar {
         ),
       actions: <Widget>[
         new IconButton(
+          icon: new Icon(Icons.refresh),
+          color: textColor,
+          iconSize: 30.0,
+          onPressed: (){
+            _courseDaysBloc.dispatch(CourseDaysEventListFolders(courseDays._course.id));
+          },
+          highlightColor: Colors.white30,
+          splashColor: Colors.white30,
+        ),
+        new IconButton(
           icon: new Icon(Icons.camera_alt),
           color: textColor,
           iconSize: 30.0,
           onPressed: (){
-            _courseDaysBloc.dispatch(CourseDaysEventTakePicture(courseDays.allItemsList, courseDays._course.parents[0], context));
+            _courseDaysBloc.dispatch(CourseDaysEventTakePicture(courseDays.allItemsList, courseDays._course.id, context));
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
@@ -314,7 +324,7 @@ class MySelectedAppbar extends AppBar {
   final CourseDaysBloc _courseDaysBloc;
   final Color selectedColor;
   final File selectedItem;
-  final _course_daysState courseDays;
+  final _CourseDaysState courseDays;
   MySelectedAppbar(this.textColor, this._courseDaysBloc, this.selectedColor, this.courseDays, this.selectedItem);
 
   Widget build(BuildContext context) {

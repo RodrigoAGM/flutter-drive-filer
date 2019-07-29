@@ -45,7 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
   Stream<HomeState> _mapListFoldersEvent(HomeEventListFolders event) async*{
     try{
       yield HomeStateLoading();
-      var result = await googleDriveRepository.findFoldersWithName(Strings.app_folder_name);
+      var result = await googleDriveRepository.findFoldersWithName(Strings.app_folder_name, "");
       var childList;
       var parent;
 
@@ -138,7 +138,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
         //Check if exists folder with the date, if not, create a new folder
         var now = new DateTime.now();
         var dayDate = now.day.toString() + "-" + now.month.toString() + "-" + now.year.toString();
-        var result = await googleDriveRepository.findFoldersWithName(dayDate);
+        var result = await googleDriveRepository.findFoldersWithName(dayDate, folderId);
         var dayFolder;
 
         if(result.isEmpty){
@@ -148,7 +148,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
           dayFolder = result.first;
         }
 
-        await googleDriveRepository.savePicture(now.toString(), dayFolder.id, _imageFile.path);
+        await googleDriveRepository.savePicture(now.toString().substring(0,now.toString().length - 7), dayFolder.id, _imageFile.path);
+        _imageFile.delete();
         yield HomeStateSearched(childList, parent);
 
       }else{
