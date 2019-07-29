@@ -70,39 +70,39 @@ class _HomeState extends State<Home>{
       setState(() { });
       return false;
     }else{
-          return showDialog(
-            context: context,
-            barrierDismissible: true,
-            builder: (BuildContext context){
-              return AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Do you want to close the app?"),
-                      )
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: (){
-                      Navigator.pop(context, false);
-                    },
-                    child: Text("No", style: TextStyle(color: Colors.red),),
-                  ),
-                  FlatButton(
-                    onPressed: (){
-                      Navigator.pop(context, true);
-                    },
-                    child: Text("Yes"),
-                  ),
+      return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context){
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Do you want to close the app?"),
+                  )
                 ],
-              );
-            }
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: (){
+                  Navigator.pop(context, false);
+                },
+                child: Text("No", style: TextStyle(color: Colors.red),),
+              ),
+              FlatButton(
+                onPressed: (){
+                  Navigator.pop(context, true);
+                },
+                child: Text("Yes"),
+              ),
+            ],
           );
+        }
+      );
     }
   }
 
@@ -120,7 +120,7 @@ class _HomeState extends State<Home>{
 
         child: Scaffold(
 
-          appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this, selectedItem).build(context) : MyAppbar(textColor, _homeBloc).build(this.context),
+          appBar: (selected) ? MySelectedAppbar(textColor, _homeBloc, selectedColor, this, selectedItem).build(context) : MyAppbar(textColor, _homeBloc, this).build(this.context),
 
           floatingActionButton: FloatingActionButton(
             onPressed: (){
@@ -379,6 +379,7 @@ class _HomeState extends State<Home>{
                         );
                       }
                     }
+
                   },
                 ),
               )
@@ -394,7 +395,9 @@ class _HomeState extends State<Home>{
 class MyAppbar extends AppBar {
   final Color textColor;
   final HomeBloc _homeBloc;
-  MyAppbar(this.textColor, this._homeBloc);
+  final _HomeState home;
+
+  MyAppbar(this.textColor, this._homeBloc, this.home);
 
   Widget build(BuildContext context) {
     return AppBar(
@@ -409,6 +412,29 @@ class MyAppbar extends AppBar {
           color: textColor,
           iconSize: 30.0,
           onPressed: (){
+            if(home.allItemsList != null && home.allItemsList.length > 0){
+              _homeBloc.dispatch(HomeEventTakePicture(home.allItemsList, home.allItemsList[0].parents[0], context));
+            }
+            else{
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (BuildContext context){
+                  return AlertDialog(
+                    title: Text("Alert"),
+                    content: Text("There are no courses to save pictures. Add a new course to start saving pictures!"),
+                    actions: <Widget>[
+                      FlatButton(
+                          onPressed: (){
+                            Navigator.pop(context);
+                          },
+                          child: Text("Ok", style: TextStyle(color: Colors.blue)),
+                      ),
+                    ],
+                  );
+                }
+              );
+            }
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
@@ -472,6 +498,7 @@ class MySelectedAppbar extends AppBar {
   MySelectedAppbar(this.textColor, this._homeBloc, this.selectedColor, this.home, this.selectedItem);
 
   Widget build(BuildContext context) {
+
     return AppBar(
       centerTitle: true,
       backgroundColor: selectedColor,
@@ -501,8 +528,41 @@ class MySelectedAppbar extends AppBar {
           color: textColor,
           iconSize: 30.0,
           onPressed: (){
-            _homeBloc.dispatch(HomeEventDeleteFolder(selectedItem.parents[0], selectedItem.id));
-            home.updateSelected(false);
+            return showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context){
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Do you want to delete " + selectedItem.name + " ?"),
+                        )
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                      child: Text("No", style: TextStyle(color: Colors.red),),
+                    ),
+                    FlatButton(
+                      onPressed: (){
+                        Navigator.pop(context);
+                        _homeBloc.dispatch(HomeEventDeleteFolder(selectedItem.parents[0], selectedItem.id));
+                        home.updateSelected(false);
+                      },
+                      child: Text("Yes"),
+                    ),
+                  ],
+                );
+              }
+            );
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,
@@ -533,4 +593,3 @@ List<File> filterSearchResults(String query, List<File>items) {
     });
     return searchedList;
 }
-

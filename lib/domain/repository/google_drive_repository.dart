@@ -1,3 +1,4 @@
+import 'dart:io' as prefix0;
 import 'package:flutter_drive_filer/domain/model/google_http_client.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
@@ -8,6 +9,7 @@ class GoogleDriveRepository{
 
   GoogleSignInAccount _account;
   final mime = "application/vnd.google-apps.folder";
+  final mimePicture = "application/vnd.google-apps.photo";
 
   GoogleDriveRepository(this._account);
 
@@ -36,7 +38,6 @@ class GoogleDriveRepository{
       print(e.toString());
       return null;
     }
-
   }
 
   Future<File> updateFolder(String name, String parent, String description, String folderColor, String folderId) async{
@@ -178,5 +179,28 @@ class GoogleDriveRepository{
       print(e);
       return null;
     }
+  }
+
+  Future<File> savePicture(String name, String parent, String path) async{
+    File picture = new File();
+    picture.name = name;
+    List<String> parents = [parent];
+    picture.parents = parents;
+    picture.mimeType = 'image/jpeg';
+
+    prefix0.File file = new prefix0.File(path);
+    var length = await file.length();
+    var media = Media(file.openRead(), length,  contentType: 'image/jpeg');
+
+    try{
+      final headers = await _account.authHeaders;
+      final httpClient = GoogleHttpClient(headers);
+      File file = await new DriveApi(httpClient).files.create(picture, uploadMedia: media);
+      return file;
+    }catch(e){
+      print(e.toString());
+      return null;
+    }
+
   }
 }

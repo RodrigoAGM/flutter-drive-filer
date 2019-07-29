@@ -2,11 +2,12 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_drive_filer/domain/repository/google_drive_repository.dart';
 import 'package:flutter_drive_filer/domain/repository/google_sign_in_repository.dart';
-import 'package:flutter_drive_filer/ui/home/home.dart';
+import 'package:flutter_drive_filer/ui/home/home_choose_folder.dart';
 import 'package:flutter_drive_filer/ui/home/home_events.dart';
 import 'package:flutter_drive_filer/ui/home/home_states.dart';
 import 'package:flutter_drive_filer/ui/login/sign_in.dart';
 import 'package:flutter_drive_filer/ui/res/strings.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState>{
@@ -35,6 +36,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
     }
     if(event is HomeEventDeleteFolder){
       yield* _mapDeleteFolderEvent(event);
+    }
+    if(event is HomeEventTakePicture){
+      yield* _mapTakePictureEvent(event);
     }
   }
 
@@ -113,6 +117,43 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>{
       var parent = event.parent;
       print(childList[0].folderColorRgb);
       yield HomeStateSearched(childList, parent);
+    }
+    catch(e){
+      print(e.toString());
+      yield HomeStateError();
+    }
+  }
+
+  Stream<HomeState> _mapTakePictureEvent(HomeEventTakePicture event) async*{
+    try{
+      var _imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+
+      var childList = event.children;
+      var parent = event.parent;
+
+      if(_imageFile != null){
+        //Get the course folder id to save the picture
+        var folderId = await Navigator.push(event.context, MaterialPageRoute(builder: (context) => HomeChooseFolder(childList)));
+
+        //Check if exists folder with the date, if not, create a new folder
+        var now = new DateTime.now();
+        var dayDate = now.day.toString() + "-" + now.month.toString() + "-" + now.year.toString();
+        var result = await googleDriveRepository.findFoldersWithName(dayDate);
+        var dayFolder;
+
+        if(result.isEmpty){
+          dayFolder = await googleDriveRepository.createFolder(dayDate, folderId, "");
+        }
+        else{
+          dayFolder = result.first;
+        }
+
+        await googleDriveRepository.savePicture(now.toString(), dayFolder.id, _imageFile.path);
+        yield HomeStateSearched(childList, parent);
+
+      }else{
+        yield HomeStateSearched(childList, parent);
+      }
     }
     catch(e){
       print(e.toString());

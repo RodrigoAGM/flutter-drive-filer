@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/drive/v3.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -56,4 +57,16 @@ class HomeEventDeleteFolder extends HomeEvent{
 
   @override
   String toString() => 'HomeEventDeleteFolder';
+}
+
+class HomeEventTakePicture extends HomeEvent{
+
+  final List<File> children;
+  final String parent;
+  final BuildContext context;
+
+  HomeEventTakePicture(this.children, this.parent, this.context);
+
+  @override
+  String toString() => 'HomeEventTakePicture';
 }
