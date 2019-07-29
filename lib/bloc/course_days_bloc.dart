@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_drive_filer/domain/repository/google_drive_repository.dart';
 import 'package:flutter_drive_filer/ui/course_days/course_days_events.dart';
 import 'package:flutter_drive_filer/ui/course_days/course_days_states.dart';
-import 'package:flutter_drive_filer/ui/res/strings.dart';
 
 class CourseDaysBloc extends Bloc<CourseDaysEvent, CourseDaysState>{
 
@@ -18,6 +17,9 @@ class CourseDaysBloc extends Bloc<CourseDaysEvent, CourseDaysState>{
     if(event is CourseDaysEventListFolders){
       yield* _mapListFoldersEvent(event);
     }
+    if(event is CourseDaysEventUpdateFolder){
+      yield* _mapUpdateFolderEvent(event);
+    }
   }
 
   Stream<CourseDaysState> _mapListFoldersEvent(CourseDaysEventListFolders event) async*{
@@ -25,11 +27,24 @@ class CourseDaysBloc extends Bloc<CourseDaysEvent, CourseDaysState>{
       yield CourseDaysStateLoading();
 
       var childList = await googleDriveRepository.findFilesInFolder(event.parent);
-      var parent = event.parent;
 
-      yield CourseDaysStateSearched(childList, parent);
+      yield CourseDaysStateSearched(childList);
 
     }catch(e){
+      yield CourseDaysStateError();
+    }
+  }
+
+  Stream<CourseDaysState> _mapUpdateFolderEvent(CourseDaysEventUpdateFolder event) async*{
+    try{
+      yield CourseDaysStateLoading();
+      await googleDriveRepository.updateFolder(event.folderName, event.parent, event.folderDescription, event.folderColor, event.folderId);
+      var childList = await googleDriveRepository.findFilesInFolder(event.parent);
+      print(childList[0].folderColorRgb);
+      yield CourseDaysStateSearched(childList);
+    }
+    catch(e){
+      print(e.toString());
       yield CourseDaysStateError();
     }
   }

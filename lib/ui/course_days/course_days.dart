@@ -278,36 +278,18 @@ class MyAppbar extends AppBar {
       backgroundColor: Colors.transparent,
       elevation: 0.0,
       titleSpacing: 0.0,
-      title: Text(Strings.app_name, style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),),
+      title: Text(
+        courseDays._course.name,
+        style: Theme.of(context).textTheme.title.copyWith(color: textColor, fontWeight: FontWeight.bold),
+        overflow: TextOverflow.ellipsis,
+        ),
       actions: <Widget>[
         new IconButton(
           icon: new Icon(Icons.camera_alt),
           color: textColor,
           iconSize: 30.0,
           onPressed: (){
-            // if(home.allItemsList != null && home.allItemsList.length > 0){
-            //   _homeBloc.dispatch(HomeEventTakePicture(home.allItemsList, home.allItemsList[0].parents[0], context));
-            // }
-            // else{
-            //   showDialog(
-            //     context: context,
-            //     barrierDismissible: true,
-            //     builder: (BuildContext context){
-            //       return AlertDialog(
-            //         title: Text("Alert"),
-            //         content: Text("There are no courses to save pictures. Add a new course to start saving pictures!"),
-            //         actions: <Widget>[
-            //           FlatButton(
-            //               onPressed: (){
-            //                 Navigator.pop(context);
-            //               },
-            //               child: Text("Ok", style: TextStyle(color: Colors.blue)),
-            //           ),
-            //         ],
-            //       );
-            //     }
-            //   );
-            // }
+            _courseDaysBloc.dispatch(CourseDaysEventTakePicture(courseDays.allItemsList, courseDays._course.parents[0], context));
           },
           highlightColor: Colors.white30,
           splashColor: Colors.white30,

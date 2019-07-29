@@ -20,9 +20,8 @@ class CourseDaysStateLoading extends CourseDaysState {
 class CourseDaysStateSearched extends CourseDaysState {
 
   final List<File> files;
-  final String parent;
 
-  CourseDaysStateSearched(this.files, this.parent);
+  CourseDaysStateSearched(this.files);
 
   @override
   String toString() => 'CourseDaysStateSearched';
