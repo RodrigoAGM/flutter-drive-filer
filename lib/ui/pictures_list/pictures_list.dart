@@ -7,6 +7,7 @@ import 'package:flutter_drive_filer/ui/pictures_list/pictures_list_states.dart';
 import 'package:flutter_drive_filer/ui/res/folder_colors.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PicturesList extends StatefulWidget {
 
@@ -61,6 +62,11 @@ class _PicturesListState extends State<PicturesList> {
       return true;
     }
   }
+
+  _launchURL(url) async {
+
+    await launch(url);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +153,7 @@ class _PicturesListState extends State<PicturesList> {
                                       });
                                     },
                                     onTap: (){
-
+                                      _launchURL("https://docs.google.com/uc?id="+allItemsList[index].id);
                                     },
                                     child: Container(
                                       alignment: Alignment.center,
